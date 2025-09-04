@@ -89,7 +89,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Partners</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/agencylogin" className="text-gray-300 ">
+                <Link href="/agentlogin" className="text-gray-300 ">
                   Medical Partners
                 </Link>
               </li>

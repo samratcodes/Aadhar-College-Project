@@ -178,7 +178,7 @@ const agentsignup = () => {
         const data = await response.json();
     
         if (response.ok) {
-          router.push('/agencylogin'); // redirect on success
+          router.push('/agentlogin'); // redirect on success
         } else {
           setError(data.message || 'Signup failed.');
         }

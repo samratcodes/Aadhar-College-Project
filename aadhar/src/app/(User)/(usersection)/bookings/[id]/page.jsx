@@ -30,7 +30,6 @@ const Page = ({ params }) => {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setFetchedData(data.data || {});
-        console.log(token);
       } catch (error) {
         console.error('Error fetching report:', error);
       } finally {
@@ -49,154 +48,147 @@ const Page = ({ params }) => {
     e.preventDefault();
     const appointmentData = {
       ...formData,
-      doctorId: id, // Include the doctor ID from params
+      doctorId: id,
     };
-    const response = await axios.post(`${API_URL}api/user/appointment/checkout-session`, JSON.stringify(appointmentData), {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    console.log("Response from booking:", response.data);
-    window.location.href = response.data.url;
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const appointmentData = {
-        ...formData,
-        doctorId: id, // Include the doctor ID from params
-      };
-  
-      console.log("Sending appointment data:", appointmentData);
-  
-      const response = await fetch(`${API_URL}api/user/appointments/`, {
-        method: 'POST',
+    const response = await axios.post(
+      `${API_URL}api/user/appointment/checkout-session`,
+      JSON.stringify(appointmentData),
+      {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(appointmentData),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
-      const responseData = await response.json();
-      console.log("Appointment created successfully:", responseData);
-      
-      // Optionally reset the form after successful submission
-      setFormData({
-        description: '',
-        dateOfAppointment: '',
-        address: '',
-      });
-  
-      // Optionally show a success message to the user
-      alert("Appointment booked successfully!");
-  
-    } catch (error) {
-      console.error("Error creating appointment:", error);
-      // Optionally show an error message to the user
-      alert("Failed to book appointment. Please try again.");
-    }
+    );
+
+    window.location.href = response.data.url;
   };
+
   if (isLoading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-        <div className="w-40 h-40 relative rounded-full overflow-hidden border-4 border-green-500 shadow-md">
-          <Image
-            src={ fetchedData.profilePicture ||"https://images.pexels.com/photos/28216688/pexels-photo-28216688/free-photo-of-autumn-camping.png?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"}
-            alt="Profile"
-            fill
-            className="object-cover"
-          />
+    <div className="max-w-7xl mx-auto mt-10 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-8 rounded-2xl shadow-lg">
+        
+    <div className="flex flex-col w-full">
+        <div className="flex flex-col items-center w-full">
+          <div className="relative w-72 h-72 rounded-2xl overflow-hidden shadow-lg hover:scale-105 transition">
+            <Image
+              src={
+                fetchedData.profilePicture ||
+                "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+              }
+              alt="Profile"
+              fill
+              className="object-cover"
+            />
+          </div>
+          </div>
+          {/* Rating */}
+          <div className="flex items-center gap-2 mt-4 text-lg text-gray-700">
+            <FaStar className="text-yellow-400" />
+            <span>{fetchedData.rating || '4.5'}/5 • 34 reviews</span>
+          </div>
+                    {/* About */}
+          <div>
+            <h2 className="text-lg font-semibold mt-8 mb-2">About</h2>
+            <p className="text-gray-700 leading-relaxed">
+              {fetchedData.bio ||
+                'Dr. John Doe is a highly experienced cardiologist with 10+ years in the medical field. Specializes in preventive care, diagnostics, and patient wellness.'}
+            </p>
+          </div>
         </div>
 
-        <div className="flex-1">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {fetchedData.firstName || 'Not available'} {fetchedData.lastName || ''}
-          </h2>
-          <p className="text-sm text-gray-600">{fetchedData.role || 'Role not available'}</p>
+        {/* Right: Info + Booking */}
+        <div className="flex flex-col justify-between space-y-6">
+          {/* Title + Price */}
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-900">
+              {fetchedData.firstName || 'Dr. John'} {fetchedData.lastName || 'Doe'}
+            </h1>
+            <p className="text-xl text-gray-600 mt-2">{fetchedData.role || 'Cardiologist'}</p>
 
-          <p className="mt-2 text-sm text-gray-700">
-            {fetchedData.bio ? fetchedData.bio : 'Bio not available'}
-          </p>
-
-          <div className="grid grid-cols-2 text-sm gap-y-2 mt-4 text-gray-800">
-            <span className="font-semibold">Email:</span>
-            <span>{fetchedData.email || 'Not available'}</span>
-
-            <span className="font-semibold">Experience:</span>
-            <span>{fetchedData.experience || 'Not available'}</span>
-
+            <div className="flex items-center gap-4 mt-4">
+              <span className="text-3xl font-bold text-green-600">
+                {fetchedData.pricePerHour ? `$${fetchedData.pricePerHour}/hr` : '$120/hr'}
+              </span>
+              <span className="px-4 py-1 text-sm bg-green-100 text-green-700 rounded-full font-medium">
+                Available
+              </span>
+            </div>
           </div>
-         
-          <span className='font-medium mt-9 text-2xl text-green-600'>{fetchedData.pricePerHour ? `$${fetchedData.pricePerHour} /hr` : '$100/hr'}</span>
-          <div className="flex items-center mt-3 text-sm text-gray-800">
-            <FaStar className="text-yellow-500 mr-1" />
-            <span>{fetchedData.rating || '3'}/5 • 23 reviews</span>
+
+
+          {/* Dummy Specialties Section */}
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Specialties</h2>
+            <div className="flex flex-wrap gap-2">
+              {['Cardiology', 'Preventive Care', 'Diagnostics', 'Nutrition'].map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-4 py-2 text-sm bg-gray-100 rounded-full border text-gray-700 hover:bg-green-50"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Booking Form */}
+          <div className="mt-4">
+            <h2 className="text-xl font-semibold text-green-600 mb-4">Book Appointment</h2>
+            <form onSubmit={handleBookAppointment} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                <textarea
+                  name="description"
+                  rows="3"
+                  className="w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Write a short message..."
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <input
+                    type="date"
+                    name="dateOfAppointment"
+                    className="w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
+                    value={formData.dateOfAppointment}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    className="w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter address..."
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-4 text-lg bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-md transition"
+              >
+                Book Now
+              </button>
+            </form>
           </div>
         </div>
-      </div>
-
-      {/* Booking Form */}
-      <div className="mt-10">
-        <h3 className="text-xl font-semibold text-green-600 mb-4">Book Appointment</h3>
-        <form onSubmit={handleBookAppointment} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-            <textarea
-              name="description"
-              rows="3"
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-            <input
-              type="date"
-              name="dateOfAppointment"
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
-              value={formData.dateOfAppointment}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-            <input
-              type="text"
-              name="address"
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
-              value={formData.address}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          </div>
-          <button
-            type="submit"
-            className="w-max bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 transition"
-          >
-            Book now
-          </button>
-        </form>
       </div>
     </div>
   );
