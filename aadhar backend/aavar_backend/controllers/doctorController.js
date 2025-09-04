@@ -39,18 +39,37 @@ export const createVitalReport = async (req, res) => {
   }
 };
 
-export const readAllVitalReports = async (req, res) => {
+ export const readAllVitalReports = async (req, res) => {
   try {
-    const { userId } = req.body;
-    console.log(userId);
-    const vitalReports = await VitalReport.findAll({ where: { userId } });
+    const { userId } = req.query; // ✅ Use query params for GET requests
 
-    return res.status(200).json({ success: true, data: vitalReports });
+    // Optional: Log for debugging
+    console.log("Fetching vital reports for user:", userId);
+
+    let vitalReports;
+
+    if (userId) {
+      // Fetch reports for a specific user
+      vitalReports = await VitalReport.findAll({ where: { userId } });
+    } else {
+      // Fetch all reports if no userId is provided
+      vitalReports = await VitalReport.findAll();
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: vitalReports,
+    });
   } catch (err) {
-    console.error(`Error: ${err.message}`);
-    return res.status(500).json({ message: "Error occured." });
+    console.error("Error fetching vital reports:", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Error occurred while fetching vital reports",
+      error: err.message,
+    });
   }
 };
+
 
 export const readAllAppointments = async (req, res) => {
   try {

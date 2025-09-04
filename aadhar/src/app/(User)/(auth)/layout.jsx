@@ -1,5 +1,5 @@
 import Footer from "@/app/components/UserComponents/Footer";
-import Navbar from "@/app/components/UserComponents/Navbar";
+import Navbar from "@/app/components/UserComponents/Landing/Navbar";
 import { Metadata } from "next";
 
 
